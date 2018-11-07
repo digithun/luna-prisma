@@ -1,0 +1,15 @@
+{
+  "name": "luna-prisma",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:digithun/luna-prisma.git",
+  "author": "pair <t.nitikarn@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "./packages/*"
+  ],
+  "devDependencies": {
+    "lerna": "^3.4.3"
+  }
+}

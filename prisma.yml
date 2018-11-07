@@ -1,0 +1,10 @@
+endpoint: ${env:PRISMA_URL}
+
+datamodel: 
+  - ./prisma.model.graphql
+
+generate:
+  - generator: typescript-client
+    output: ./client
+# seed:
+  # import: ./seed.graphql

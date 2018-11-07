@@ -1,0 +1,16 @@
+{
+    "todos": [
+        {
+            "id": "todo_id_00",
+            "name": "todo_name_00",
+            "state": false,
+            "color": "RED"
+        },
+        {
+            "id": "todo_id_10",
+            "name": "todo_name_10",
+            "state": false,
+            "color": "BLUE"
+        }
+    ]
+}
