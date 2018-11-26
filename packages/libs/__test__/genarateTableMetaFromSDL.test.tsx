@@ -6,7 +6,6 @@ import {
     getDataFromDatasourceItem,
 } from "../genarateTableMetaFromSDL"
 
-
 describe("grnarateFromSDLTest", () => {
     it("should parse column SDL corretly", () => {
         expect(parseSDLToTableColumnInfos(gql`
@@ -18,34 +17,34 @@ describe("grnarateFromSDLTest", () => {
                   id
               }
             }
-          } `, require('./luna-schema'), require('./mock-data-todoLits').todoLists)).toEqual([[{
+          } `, require("./luna-schema"), require("./mock-data-todoLits").todoLists)).toEqual([[{
                 kind: "TableStringColumnInfo",
                 key: "id",
                 label: "id",
-                path: "query.todoLists.id"
+                path: "query.todoLists.id",
             }, {
                 kind: "TableStringColumnInfo",
                 key: "name",
                 label: "Name",
-                path: "query.todoLists.name"
+                path: "query.todoLists.name",
             }], [
                 {
                     path: "query.todoLists.id",
-                    value: "todo_list_id_0"
+                    value: "todo_list_id_0",
                 },
                 {
                     path: "query.todoLists.name",
-                    value: "todo_list_name_0"
-                }
+                    value: "todo_list_name_0",
+                },
             ], [
                 {
                     path: "query.todoLists.id",
-                    value: "todo_list_id_1"
+                    value: "todo_list_id_1",
                 },
                 {
                     path: "query.todoLists.name",
-                    value: "todo_list_name_1"
-                }
+                    value: "todo_list_name_1",
+                },
             ]])
     })
     it("should table header corretly", () => {
@@ -58,16 +57,16 @@ describe("grnarateFromSDLTest", () => {
                   id
               }
             }
-          } `, require('./luna-schema'))).toEqual([{
+          } `, require("./luna-schema"))).toEqual([{
                 kind: "TableStringColumnInfo",
                 key: "id",
                 label: "id",
-                path: "query.todoLists.id"
+                path: "query.todoLists.id",
             }, {
                 kind: "TableStringColumnInfo",
                 key: "name",
                 label: "Name",
-                path: "query.todoLists.name"
+                path: "query.todoLists.name",
             }])
 
         // Test Enum and Boolean Type
@@ -79,20 +78,20 @@ describe("grnarateFromSDLTest", () => {
                     state @column(label: "State")
                     color @column(label: "Color")
                 }
-                
-              } `, require('./luna-schema'))).toEqual(
+
+              } `, require("./luna-schema"))).toEqual(
             [
                 {
                     kind: "TableStringColumnInfo",
                     key: "name",
                     label: "Name",
-                    path: "query.todoes.name"
+                    path: "query.todoes.name",
                 },
                 {
                     kind: "TableBooleanColumnInfo",
                     key: "state",
                     label: "State",
-                    path: "query.todoes.state"
+                    path: "query.todoes.state",
                 },
                 {
                     kind: "TableEnumColumnInfo",
@@ -103,8 +102,8 @@ describe("grnarateFromSDLTest", () => {
                         "RED",
                         "BLUE",
                         "GREEN",
-                    ]
-                }
+                    ],
+                },
             ])
     })
     it("should get Data corretly", () => {
@@ -114,13 +113,13 @@ describe("grnarateFromSDLTest", () => {
                     kind: "TableStringColumnInfo",
                     key: "name",
                     label: "Name",
-                    path: "query.todos.name"
+                    path: "query.todos.name",
                 },
                 {
                     kind: "TableBooleanColumnInfo",
                     key: "state",
                     label: "State",
-                    path: "query.todos.state"
+                    path: "query.todos.state",
                 },
                 {
                     kind: "TableEnumColumnInfo",
@@ -131,42 +130,42 @@ describe("grnarateFromSDLTest", () => {
                         "RED",
                         "BLUE",
                         "GREEN",
-                    ]
-                }
+                    ],
+                },
             ]
 
         const result =
             [
                 [
                     {
-                        "path": "query.todos.name",
-                        "value": "todo_name_00"
+                        path: "query.todos.name",
+                        value: "todo_name_00",
                     },
                     {
-                        "path": "query.todos.state",
-                        "value": false
+                        path: "query.todos.state",
+                        value: false,
                     },
                     {
-                        "path": "query.todos.color",
-                        "value": "RED"
-                    }
+                        path: "query.todos.color",
+                        value: "RED",
+                    },
                 ],
                 [
                     {
-                        "path": "query.todos.name",
-                        "value": "todo_name_10"
+                        path: "query.todos.name",
+                        value: "todo_name_10",
                     },
                     {
-                        "path": "query.todos.state",
-                        "value": false
+                        path: "query.todos.state",
+                        value: false,
                     },
                     {
-                        "path": "query.todos.color",
-                        "value": "BLUE"
-                    }
-                ]
+                        path: "query.todos.color",
+                        value: "BLUE",
+                    },
+                ],
             ]
-        expect(getDataFromDatasourceItem(require('./mock-data-todos').todos, columnInfos)).toEqual(result)
+        expect(getDataFromDatasourceItem(require("./mock-data-todos").todos, columnInfos)).toEqual(result)
     })
     it("should parse column SDL invalid", () => {
         expect(() => getTableHeaderColumnInfo(gql`
@@ -178,7 +177,7 @@ describe("grnarateFromSDLTest", () => {
                   id
               }
             }
-          } `, require('./luna-schema'))).toThrow()
+          } `, require("./luna-schema"))).toThrow()
 
         expect(() => getTableHeaderColumnInfo(gql`
         query {
@@ -189,7 +188,7 @@ describe("grnarateFromSDLTest", () => {
                   id
               }
             }
-          } `, require('./luna-schema'))).toThrow()
+          } `, require("./luna-schema"))).toThrow()
     })
     it("should table header format invalid", () => {
         const columnInfos: any =
@@ -198,21 +197,21 @@ describe("grnarateFromSDLTest", () => {
                     kind: "TableStringColumnInfo",
                     key: "name",
                     label: "Name",
-                    path: "query.todoLists.todos.name"
+                    path: "query.todoLists.todos.name",
                 },
                 {
                     kind: "TableBooleanColumnInfo",
                     key: "state",
                     label: "State",
-                    path: "query.todoLists.todos.state"
-                }
+                    path: "query.todoLists.todos.state",
+                },
             ]
 
         expect(() =>
             getDataFromDatasourceItem(
-                require('./mock-data-todoLits').todoLists,
-                columnInfos
-            )
+                require("./mock-data-todoLits").todoLists,
+                columnInfos,
+            ),
         ).toThrow()
     })
 })
