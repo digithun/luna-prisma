@@ -44,6 +44,7 @@
     "interface-name": [false, "never-prefix"],
     "no-reference-import": false,
     "trailing-comma": [false, { "multiline": "never", "singleline": "never" }],
-    "interface-over-type-literal": false
+    "interface-over-type-literal": false,
+    "arrow-parens": false
   }
 }

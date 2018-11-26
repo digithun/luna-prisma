@@ -80,12 +80,12 @@ function getColumnInfo(
   schemaAST: DocumentNode
 ): TableColumnInfo[] {
   let result: TableColumnInfo[] = []
-  sectionNode.selections.map((section) => {
+  sectionNode.selections.map(section => {
     if (section.kind === "Field") {
       if (section.directives) {
-        section.directives.map((directive) => {
+        section.directives.map(directive => {
           if (directive.arguments) {
-            directive.arguments.map((argument) => {
+            directive.arguments.map(argument => {
               if (argument.value.kind === "StringValue") {
                 const data = getNameTypeValue(
                   path,
@@ -179,7 +179,7 @@ function getNameTypeValue(
   schemaAST: DocumentNode
 ): TableColumnInfo | undefined {
   let result: TableColumnInfo | undefined
-  fieldDefinition.map((m) => {
+  fieldDefinition.map(m => {
     visit(m, {
       FieldDefinition(node) {
         if (m.name.kind === "Name" && m.name.value === nameSearch) {
@@ -229,7 +229,7 @@ function getEnumColumnInfoValue(
   visit(schemaAST, {
     EnumTypeDefinition(node) {
       if (node.name.value === nameSearch && node.values) {
-        node.values.map((value) => {
+        node.values.map(value => {
           if (value.name != null) {
             enumValues.push(value.name.value)
           }
@@ -244,7 +244,7 @@ export function getDataFromDatasourceItem(
   datasource: any[],
   columns: TableColumnInfo[]
 ): Array<Array<{ path: string; value: string }>> {
-  return datasource.map((data) => {
+  return datasource.map(data => {
     return columns.reduce<Array<{ path: string; value: string }>>(
       (fieldDataList, column) => {
         if (
@@ -259,7 +259,7 @@ export function getDataFromDatasourceItem(
           if (column.kind === "TableBooleanColumnInfo") {
             fieldDataList.push({
               path: column.path,
-              value: value ? "true" : "false",
+              value, // ? "true" : "false",
             })
           } else {
             fieldDataList.push({
@@ -287,7 +287,7 @@ export function getTablePath(query: ASTNode): string {
   visit(query, {
     OperationDefinition(node) {
       if (node.operation === "query") {
-        node.selectionSet.selections.map((selection) => {
+        node.selectionSet.selections.map(selection => {
           if (selection.kind === "Field") {
             result = selection.name.value
           }

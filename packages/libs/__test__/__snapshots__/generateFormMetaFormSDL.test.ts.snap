@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`should create FormMeta correctly 1`] = `
+Array [
+  Object {
+    "isEditable": false,
+    "isNonNull": true,
+    "key": "id",
+    "kind": "FormTextInputFieldMeta",
+    "path": "query.todo.id",
+    "typeName": "ID",
+  },
+  Object {
+    "isEditable": true,
+    "isNonNull": true,
+    "key": "name",
+    "kind": "FormTextInputFieldMeta",
+    "path": "query.todo.name",
+    "typeName": "String",
+  },
+  Object {
+    "isEditable": true,
+    "isNonNull": false,
+    "key": "color",
+    "kind": "FormEnumInputFieldMeta",
+    "options": Array [
+      "RED",
+      "BLUE",
+      "GREEN",
+    ],
+    "path": "query.todo.color",
+    "typeName": "ColorEnum",
+  },
+]
+`;

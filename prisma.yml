@@ -5,6 +5,6 @@ datamodel:
 
 generate:
   - generator: typescript-client
-    output: ./client
+    output: ./packages/cli/__test__
 seed:
   import: ./seed.graphql
