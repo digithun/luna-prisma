@@ -35,20 +35,19 @@ export interface IGraphQLTableViewPropTypes<TItem = any, TVariables = any> {
   onDeleteClick?: (item: TItem) => void
 }
 
-export default class GraphQLTableView<
-  TItem,
-  TVariables
-> extends React.Component<
+export class GraphQLTableView<TItem, TVariables> extends React.Component<
   IGraphQLTableViewPropTypes<TItem, TVariables>,
   {
-    datasource: any[],
-    loading?: boolean,
+    datasource: any[]
+    rawDatasource: any[]
+    loading?: boolean
   }
 > {
   constructor(props) {
     super(props)
     this.state = {
       datasource: [],
+      rawDatasource: [],
       loading: true,
     }
   }
@@ -72,8 +71,9 @@ export default class GraphQLTableView<
         datasource: parseSDLToTableColumnInfos(
           this.props.query,
           this.props.introspection,
-          data[dataKey],
+          data[dataKey]
         ),
+        rawDatasource: data[dataKey],
         loading,
       })
     })
@@ -131,7 +131,7 @@ export default class GraphQLTableView<
   private handleOnEditClick(index: number) {
     return (e: React.SyntheticEvent<HTMLButtonElement>) => {
       if (this.props.onEditClick) {
-        this.props.onEditClick(this.state.datasource[index])
+        this.props.onEditClick(this.state.rawDatasource[index])
       }
     }
   }

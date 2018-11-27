@@ -11,11 +11,16 @@ it("should create FormMeta correctly", () => {
   expect(
     parseSDLToFormMeta(
       gql`
+        fragment TodoForm on Todo {
+          id @input(label: "ID")
+          name @input
+          color @input(label: "Colour")
+        }
+
         query($where: TodoWhereUniqueInput!) {
           todo(where: $where) @form {
-            id @input(label: "ID")
-            name @input
-            color @input(label: "Colour")
+            ...TodoForm
+            description @input(label: "Description")
           }
           t: todo(where: $where) {
             id

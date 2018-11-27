@@ -1,13 +1,16 @@
 import {
   IntrospectionQuery,
   ASTNode,
-  visit,
   DocumentNode,
   ScalarTypeDefinitionNode,
   EnumTypeDefinitionNode,
   buildClientSchema,
   printSchema,
+  visit,
   parse,
+  FragmentDefinitionNode,
+  FieldNode,
+  BREAK,
 } from "graphql"
 
 interface FormInputFieldMeta {
@@ -134,7 +137,9 @@ export function findTypeDefinitionInfoFromSchema(
           n.name.value === currentTypeName
       )
       if (!abstractType) {
-        throw new Error(`Cannot find type ${currentTypeName} in schema`)
+        throw new Error(
+          `Cannot find type ${currentTypeName} in schema ${pathname}`
+        )
       }
       if (abstractType.kind === "EnumTypeDefinition") {
         return {
@@ -163,11 +168,33 @@ export function findTypeDefinitionInfoFromSchema(
     }
   }
 }
+export function getFormDataFieldKey(query: ASTNode): FieldNode | null {
+  const key: string | undefined = undefined
+  let fieldNode: FieldNode
+
+  visit(query, {
+    Directive: {
+      enter: node => {
+        if (node.name.value === FormDirectiveName) {
+          return BREAK
+        }
+      },
+    },
+    Field: {
+      enter: node => {
+        fieldNode = node
+      },
+    },
+  })
+
+  // @ts-ignore
+  return fieldNode
+}
 export function parseSDLToFormMeta(
   query: ASTNode,
   schemaIntrospection: IntrospectionQuery
 ) {
-  const result: FormInputFieldMeta[] = []
+  const result: FormMeta[] = []
 
   const schemaAST = parse(printSchema(buildClientSchema(schemaIntrospection)))
 
@@ -176,6 +203,9 @@ export function parseSDLToFormMeta(
   const currentPath: ASTNode[] = []
 
   visit(query, {
+    FragmentDefinition: {
+      enter: () => false,
+    },
     OperationDefinition: {
       enter: node => {
         currentPath.push(node)
@@ -191,7 +221,7 @@ export function parseSDLToFormMeta(
           return undefined
         } else if (node.name.value === InputDirectiveName) {
           // process each selection field
-          shouldVisitFieldNode = true
+          console.log(node.name.value, currentPath.length)
           const meta = findTypeDefinitionInfoFromSchema(schemaAST, currentPath)
           if (meta) {
             result.push(meta)
@@ -201,6 +231,64 @@ export function parseSDLToFormMeta(
           shouldVisitFieldNode = false
           return false
         }
+      },
+    },
+    FragmentSpread: {
+      enter: fragmentSpreadNode => {
+        // ถ้ามี fragment spread ให้เอา Field ด้านในทั้งหมด
+        // ของ Fragment spread มา push กลับไปใส่ path
+        // เพื่อทำให้ผลลัพธ์ออกมาเหมือนเดิม
+        const fragmentName = fragmentSpreadNode.name.value
+        let currentFragmentDefinitionNode: FragmentDefinitionNode | null = null
+        let currentField: FieldNode | null = null
+        // หา Fragment Definition ก่อน
+        visit(query, {
+          FragmentDefinition: {
+            enter: fragmentDefinitionNode => {
+              if (fragmentDefinitionNode.name.value === fragmentName) {
+                currentFragmentDefinitionNode = fragmentDefinitionNode
+                return undefined
+              } else {
+                return false
+              }
+            },
+            leave: fragmentDefinitionNode => {
+              currentFragmentDefinitionNode = null
+            },
+          },
+          Field: {
+            enter: fieldNode => {
+              if (currentFragmentDefinitionNode) {
+                currentField = fieldNode
+                currentPath.push(fieldNode)
+              }
+            },
+            leave: fieldNode => {
+              currentField = null
+              if (currentFragmentDefinitionNode) {
+                currentPath.pop()
+              }
+            },
+          },
+          Directive: {
+            enter: directiveNode => {
+              if (
+                currentFragmentDefinitionNode &&
+                currentField &&
+                directiveNode.name.value === InputDirectiveName
+              ) {
+                console.log("nested", directiveNode.name.value)
+                const meta = findTypeDefinitionInfoFromSchema(
+                  schemaAST,
+                  currentPath
+                )
+                if (meta) {
+                  result.push(meta)
+                }
+              }
+            },
+          },
+        })
       },
     },
     Field: {

@@ -1,14 +1,14 @@
 import {
   ASTNode,
-  visit,
   IntrospectionQuery,
-  buildClientSchema,
-  printSchema,
-  parse,
   FieldDefinitionNode,
   DocumentNode,
   SelectionSetNode,
 } from "graphql"
+
+import { visit, parse } from "graphql/language"
+import { buildClientSchema, printSchema } from "graphql/utilities"
+
 const objectPath = require("object-path")
 interface TableCommonColumnInfo {
   key: string
