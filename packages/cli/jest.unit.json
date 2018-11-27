@@ -1,0 +1,31 @@
+{
+  "collectCoverageFrom": [
+      "**/*.{ts,tsx}",
+      "!**/node_modules/**",
+      "!**/vendor/**"
+  ],
+  "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+  },
+  "testMatch": [
+      "<rootDir>/**/__test__/**/*.test.ts",
+      "<rootDir>/**/__test__/**/*.test.tsx"
+  ],
+  "snapshotSerializers": [
+      "enzyme-to-json/serializer"
+  ],
+  "testPathIgnorePatterns": [
+      "/node_modules",
+      "/prisma/client/",
+      "/scripts/",
+      "/.next/"
+  ],
+  "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+  ]
+}

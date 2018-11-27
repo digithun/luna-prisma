@@ -1,0 +1,50 @@
+{
+  "defaultSeverity": "error",
+  "extends": ["tslint-react", "tslint:recommended"],
+  "cliOptions": {
+    "exclude": [
+      "*.spec.ts",
+      "*.spec.tsx",
+      "*.test.ts",
+      "*.test.tsx",
+      "**/*.stories.tsx",
+      "**/*.stories.ts",
+      "**/__test__"
+    ]
+  },
+  "jsRules": {
+    "no-unused-expression": true,
+    "no-duplicate-imports": true,
+    "no-eval": true,
+    "no-use-before-declare": true,
+    "no-var-keyword": true
+  },
+  "rules": {
+    "jsx-alignment": true,
+    "jsx-boolean-value": false,
+    "jsx-curly-spacing": [true, "never"],
+    "jsx-no-multiline-js": false,
+    "jsx-no-lambda": true,
+    "jsx-wrap-multiline": true,
+
+    "no-require-imports": [false],
+    "no-var-requires": false,
+    "max-line-length": [true, 180],
+    "max-classes-per-file": false,
+    "object-literal-sort-keys": false,
+
+    "semicolon": [true, "never"],
+    "no-console": false,
+    "quotemark": [true, "double"],
+    "ordered-imports": false,
+    "no-empty-interface": false,
+    "no-unused-expression": true,
+    "member-ordering": [true, { "order": "fields-first" }],
+    "variable-name": false,
+    "interface-name": [false, "never-prefix"],
+    "no-reference-import": false,
+    "trailing-comma": [false, { "multiline": "never", "singleline": "never" }],
+    "interface-over-type-literal": false,
+    "arrow-parens": false
+  }
+}

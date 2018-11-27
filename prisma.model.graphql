@@ -4,8 +4,6 @@ enum ColorEnum {
     GREEN
 }
 
-
-
 type Todo {
     id: ID! @unique
     name: String!

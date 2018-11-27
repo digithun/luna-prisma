@@ -1,0 +1,48 @@
+{
+  "compilerOptions": {
+    "outDir": "./build",
+    "strictFunctionTypes": true,
+    "types": [
+      "jest",
+      "node",
+      "reflect-metadata"
+    ],
+    "declaration": true,
+    "baseUrl": ".",
+    "noEmitOnError": false,
+    "experimentalDecorators": true,
+    "noUnusedLocals": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "sourceMap": true,
+    "jsx": "react",
+    "target": "es2015",
+    "lib": [
+      "es2015",
+      "dom",
+      "es5",
+      "es6",
+      "esnext.asynciterable"
+    ],
+    "typeRoots": [
+      "node_modues/@types",
+      "./external-types"
+    ]
+  },
+  "include": [
+    "./**/*.ts",
+    "./**/*.tsx"
+  ],
+  "exclude": [
+    "prisma",
+    "node_modules",
+    "__test__",
+    "dist",
+    ".next"
+  ]
+}
