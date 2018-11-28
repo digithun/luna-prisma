@@ -92,104 +92,106 @@ describe("grnarateFromSDLTest", () => {
     ])
 
     // Test Enum and Boolean Type
-    expect(
-      getTableHeaderColumnInfo(
-        gql`
-          query {
-            todoes {
-              id
-              name @column(lable: "Name")
-              state @column(label: "State")
-              color @column(label: "Color")
-            }
-          }
-        `,
-        require("./luna-schema")
-      )
-    ).toEqual([
-      {
-        kind: "TableStringColumnInfo",
-        key: "name",
-        label: "Name",
-        path: "query.todoes.name",
-      },
-      {
-        kind: "TableBooleanColumnInfo",
-        key: "state",
-        label: "State",
-        path: "query.todoes.state",
-      },
-      {
-        kind: "TableEnumColumnInfo",
-        key: "color",
-        label: "Color",
-        path: "query.todoes.color",
-        enumValues: ["RED", "BLUE", "GREEN"],
-      },
-    ])
+    expect(getTableHeaderColumnInfo(gql`
+            query {
+                todoes {
+                    id
+                    name @column(lable: "Name")
+                    state @column(label: "State")
+                    color @column(label: "Color")
+                }
+
+              } `, require('./luna-schema'))).toEqual(
+      [
+        {
+          kind: "TableStringColumnInfo",
+          key: "name",
+          label: "Name",
+          path: "query.todoes.name"
+        },
+        {
+          kind: "TableBooleanColumnInfo",
+          key: "state",
+          label: "State",
+          path: "query.todoes.state"
+        },
+        {
+          kind: "TableEnumColumnInfo",
+          key: "color",
+          label: "Color",
+          path: "query.todoes.color",
+          enumValues: [
+            "RED",
+            "BLUE",
+            "GREEN",
+          ]
+        }
+      ])
   })
   it("should get Data corretly", () => {
-    const columnInfos: any = [
-      {
-        kind: "TableStringColumnInfo",
-        key: "name",
-        label: "Name",
-        path: "query.todos.name",
-      },
-      {
-        kind: "TableBooleanColumnInfo",
-        key: "state",
-        label: "State",
-        path: "query.todos.state",
-      },
-      {
-        kind: "TableEnumColumnInfo",
-        key: "color",
-        label: "Color",
-        path: "query.todos.color",
-        enumValues: ["RED", "BLUE", "GREEN"],
-      },
-    ]
+    const columnInfos: any =
+      [
+        {
+          kind: "TableStringColumnInfo",
+          key: "name",
+          label: "Name",
+          path: "query.todos.name"
+        },
+        {
+          kind: "TableBooleanColumnInfo",
+          key: "state",
+          label: "State",
+          path: "query.todos.state"
+        },
+        {
+          kind: "TableEnumColumnInfo",
+          key: "color",
+          label: "Color",
+          path: "query.todos.color",
+          enumValues: [
+            "RED",
+            "BLUE",
+            "GREEN",
+          ]
+        }
+      ]
 
-    const result = [
+    const result =
       [
-        {
-          path: "query.todos.name",
-          value: "todo_name_00",
-        },
-        {
-          path: "query.todos.state",
-          value: false,
-        },
-        {
-          path: "query.todos.color",
-          value: "RED",
-        },
-      ],
-      [
-        {
-          path: "query.todos.name",
-          value: "todo_name_10",
-        },
-        {
-          path: "query.todos.state",
-          value: false,
-        },
-        {
-          path: "query.todos.color",
-          value: "BLUE",
-        },
-      ],
-    ]
-    expect(
-      getDataFromDatasourceItem(require("./mock-data-todos").todos, columnInfos)
-    ).toEqual(result)
+        [
+          {
+            "path": "query.todos.name",
+            "value": "todo_name_00"
+          },
+          {
+            "path": "query.todos.state",
+            "value": false
+          },
+          {
+            "path": "query.todos.color",
+            "value": "RED"
+          }
+        ],
+        [
+          {
+            "path": "query.todos.name",
+            "value": "todo_name_10"
+          },
+          {
+            "path": "query.todos.state",
+            "value": false
+          },
+          {
+            "path": "query.todos.color",
+            "value": "BLUE"
+          }
+        ]
+      ]
+    expect(getDataFromDatasourceItem(require('./mock-data-todos').todos, columnInfos)).toEqual(result)
   })
   it("should parse column SDL invalid", () => {
-    expect(() =>
-      getTableHeaderColumnInfo(
-        gql`
-          query {
+    expect(() => getTableHeaderColumnInfo(gql`
+        query {
             stodoLists {
               id @column(lable: "id")
               name @column(lable: "Name")
@@ -199,8 +201,8 @@ describe("grnarateFromSDLTest", () => {
             }
           }
         `,
-        require("./luna-schema")
-      )
+      require("./luna-schema")
+    )
     ).toThrow()
 
     expect(() =>

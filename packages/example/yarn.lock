@@ -1937,7 +1937,7 @@ apollo-tracing@^0.1.0:
   dependencies:
     graphql-extensions "~0.0.9"
 
-apollo-upload-client@^9.0.0:
+apollo-upload-client@^9.1.0:
   version "9.1.0"
   resolved "https://registry.yarnpkg.com/apollo-upload-client/-/apollo-upload-client-9.1.0.tgz#13191714ae07388088f2c773ebbfd53ba2f64c53"
   integrity sha512-ZN5gsbBjImEZTWWTUHpCEGDasnoBGbaODpznQ5EawyNHceuFYSNJbbft+ZZ841vZAcj9XZdKUKoaLBlMZ/r7nw==

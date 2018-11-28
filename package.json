@@ -2,10 +2,12 @@
   "name": "luna-prisma",
   "version": "1.0.0",
   "main": "index.js",
+  "scripts": {
+    "build": "yarn tsc"
+  },
   "repository": "git@github.com:digithun/luna-prisma.git",
   "author": "pair <t.nitikarn@gmail.com>",
   "license": "MIT",
-  "private": true,
   "workspaces": [
     "./packages/*"
   ],

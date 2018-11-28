@@ -9,15 +9,15 @@
         "dev": "next"
     },
     "dependencies": {
+        "luna-prisma-tools": "*",
         "apollo": "^1.9.2",
         "apollo-boost": "^0.1.16",
-        "luna-prisma-tools": "*",
         "apollo-cache-inmemory": "^1.3.5",
         "apollo-cli": "^0.4.0",
         "apollo-client": "^2.4.2",
         "apollo-link": "^1.2.3",
         "apollo-link-http": "^1.5.5",
-        "apollo-upload-client": "^9.0.0",
+        "apollo-upload-client": "^9.1.0",
         "bootstrap": "^4.1.3",
         "classnames": "^2.2.6",
         "dotnet": "^1.1.4",

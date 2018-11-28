@@ -43,6 +43,7 @@
     "node_modules",
     "__test__",
     "dist",
-    ".next"
+    ".next",
+    "typings"
   ]
 }
