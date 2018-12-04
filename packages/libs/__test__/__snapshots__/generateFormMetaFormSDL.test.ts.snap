@@ -31,5 +31,13 @@ Array [
     "path": "query.todo.color",
     "typeName": "ColorEnum",
   },
+  Object {
+    "isEditable": true,
+    "isNonNull": false,
+    "key": "description",
+    "kind": "FormTextInputFieldMeta",
+    "path": "query.todo.description",
+    "typeName": "String",
+  },
 ]
 `;

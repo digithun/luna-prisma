@@ -1,13 +1,17 @@
 import {
   IntrospectionQuery,
   ASTNode,
-  visit,
   DocumentNode,
   ScalarTypeDefinitionNode,
   EnumTypeDefinitionNode,
   buildClientSchema,
   printSchema,
+  visit,
   parse,
+  FragmentDefinitionNode,
+  FieldNode,
+  BREAK,
+  DirectiveNode,
 } from "graphql"
 
 interface FormInputFieldMeta {
@@ -25,6 +29,11 @@ interface FormDateInputFieldMeta extends FormInputFieldMeta {
 
 interface FormIDInputFieldMeta extends FormInputFieldMeta {
   kind: "FormIDInputFieldMeta"
+  label?: string
+}
+
+interface FormBooleanInputFieldMeta extends FormInputFieldMeta {
+  kind: "FormBooleanInputFieldMeta"
   label?: string
 }
 
@@ -47,6 +56,7 @@ export type FormMeta =
   | FormTextInputFieldMeta
   | FormIDInputFieldMeta
   | FormDateInputFieldMeta
+  | FormBooleanInputFieldMeta
 
 export function findTypeDefinitionInfoFromSchema(
   schema: DocumentNode,
@@ -124,6 +134,15 @@ export function findTypeDefinitionInfoFromSchema(
         path: pathname,
         typeName: currentTypeName,
       }
+    case "Boolean":
+      return {
+        isNonNull,
+        isEditable,
+        key,
+        kind: "FormBooleanInputFieldMeta",
+        path: pathname,
+        typeName: currentTypeName,
+      }
     default: {
       // find enum, scalar type if currentTypeName
       // is not Primitive data type
@@ -134,7 +153,9 @@ export function findTypeDefinitionInfoFromSchema(
           n.name.value === currentTypeName
       )
       if (!abstractType) {
-        throw new Error(`Cannot find type ${currentTypeName} in schema`)
+        throw new Error(
+          `Cannot find type ${currentTypeName} in schema ${pathname}`
+        )
       }
       if (abstractType.kind === "EnumTypeDefinition") {
         return {
@@ -163,11 +184,63 @@ export function findTypeDefinitionInfoFromSchema(
     }
   }
 }
+
+export function getDirectiveArgs(directive: DirectiveNode) {
+  const result: { [key: string]: any } = {}
+
+  visit(directive, {
+    Argument: argumentNode => {
+      if (argumentNode.value && argumentNode.value.kind === "StringValue") {
+        result[argumentNode.name.value] = argumentNode.value.value
+      }
+    },
+  })
+
+  return result
+}
+
+export function getFormLabel(query: ASTNode) {
+  let label = ""
+  visit(query, {
+    Directive: node => {
+      if (node.name.value === FormDirectiveName) {
+        const args = getDirectiveArgs(node)
+        label = args.label
+        return BREAK
+      }
+    },
+  })
+
+  return label
+}
+
+export function getFormDataFieldKey(query: ASTNode): FieldNode | null {
+  const key: string | undefined = undefined
+  let fieldNode: FieldNode
+
+  visit(query, {
+    Directive: {
+      enter: node => {
+        if (node.name.value === FormDirectiveName) {
+          return BREAK
+        }
+      },
+    },
+    Field: {
+      enter: node => {
+        fieldNode = node
+      },
+    },
+  })
+
+  // @ts-ignore
+  return fieldNode
+}
 export function parseSDLToFormMeta(
   query: ASTNode,
   schemaIntrospection: IntrospectionQuery
 ) {
-  const result: FormInputFieldMeta[] = []
+  const result: FormMeta[] = []
 
   const schemaAST = parse(printSchema(buildClientSchema(schemaIntrospection)))
 
@@ -176,6 +249,9 @@ export function parseSDLToFormMeta(
   const currentPath: ASTNode[] = []
 
   visit(query, {
+    FragmentDefinition: {
+      enter: () => false,
+    },
     OperationDefinition: {
       enter: node => {
         currentPath.push(node)
@@ -191,9 +267,14 @@ export function parseSDLToFormMeta(
           return undefined
         } else if (node.name.value === InputDirectiveName) {
           // process each selection field
-          shouldVisitFieldNode = true
           const meta = findTypeDefinitionInfoFromSchema(schemaAST, currentPath)
+          // after meta from
+          // remote schema already extract
+          // check if meta is avaliable
+          // and then get label from directive args
           if (meta) {
+            const args = getDirectiveArgs(node)
+            meta.label = args.label
             result.push(meta)
           }
           return undefined
@@ -201,6 +282,64 @@ export function parseSDLToFormMeta(
           shouldVisitFieldNode = false
           return false
         }
+      },
+    },
+    FragmentSpread: {
+      enter: fragmentSpreadNode => {
+        // ถ้ามี fragment spread ให้เอา Field ด้านในทั้งหมด
+        // ของ Fragment spread มา push กลับไปใส่ path
+        // เพื่อทำให้ผลลัพธ์ออกมาเหมือนเดิม
+        const fragmentName = fragmentSpreadNode.name.value
+        let currentFragmentDefinitionNode: FragmentDefinitionNode | null = null
+        let currentField: FieldNode | null = null
+        // หา Fragment Definition ก่อน
+        visit(query, {
+          FragmentDefinition: {
+            enter: fragmentDefinitionNode => {
+              if (fragmentDefinitionNode.name.value === fragmentName) {
+                currentFragmentDefinitionNode = fragmentDefinitionNode
+                return undefined
+              } else {
+                return false
+              }
+            },
+            leave: fragmentDefinitionNode => {
+              currentFragmentDefinitionNode = null
+            },
+          },
+          Field: {
+            enter: fieldNode => {
+              if (currentFragmentDefinitionNode) {
+                currentField = fieldNode
+                currentPath.push(fieldNode)
+              }
+            },
+            leave: fieldNode => {
+              currentField = null
+              if (currentFragmentDefinitionNode) {
+                currentPath.pop()
+              }
+            },
+          },
+          Directive: {
+            enter: directiveNode => {
+              if (
+                currentFragmentDefinitionNode &&
+                currentField &&
+                directiveNode.name.value === InputDirectiveName
+              ) {
+                console.log("nested", directiveNode.name.value)
+                const meta = findTypeDefinitionInfoFromSchema(
+                  schemaAST,
+                  currentPath
+                )
+                if (meta) {
+                  result.push(meta)
+                }
+              }
+            },
+          },
+        })
       },
     },
     Field: {

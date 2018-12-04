@@ -9,7 +9,7 @@ type Todo {
     name: String!
     description: String
     state: Boolean @default(value: false)
-    color: ColorEnum
+    color: ColorEnum @default(value: BLUE)
 }
 
 type TodoList {

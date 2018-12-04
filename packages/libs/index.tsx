@@ -1,6 +1,4 @@
-import {
-  parseSDLToTableColumnInfos,
-  TableColumnInfo,
-} from "./genarateTableMetaFromSDL"
-import GraphQLTableView from "./GraphQLTableView"
-export { parseSDLToTableColumnInfos, TableColumnInfo, GraphQLTableView }
+export * from "./genarateTableMetaFromSDL"
+export * from "./generateFormMetaFromSDL"
+export * from "./GraphQLFormView"
+export * from "./GraphQLTableView"

@@ -1,5 +1,5 @@
-endpoint: ${env:PRISMA_URL}
-
+## Development usage only
+endpoint: http://localhost:4466/luna/default
 datamodel: 
   - ./prisma.model.graphql
 
