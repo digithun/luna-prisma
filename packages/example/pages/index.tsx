@@ -80,7 +80,7 @@ export default class extends React.Component {
     })
     return (
       <div className="title">
-        <div>
+        <div className="py-3 px-3">
           <h4>{"Todo Lists"}</h4>
           <GraphQLTableView
             client={client}
@@ -89,7 +89,7 @@ export default class extends React.Component {
           />
         </div>
 
-        <div>
+        <div className="py-3 px-3">
           <h4>{"Todo"}</h4>
           <GraphQLTableView
             client={client}
@@ -97,7 +97,6 @@ export default class extends React.Component {
             introspection={require("../static/luna-schema.json")}
             // tslint:disable-next-line:jsx-no-lambda
             onEditClick={item => {
-              console.log(item)
               Router.push(`/todo?id=${item.id}`)
             }}
           />

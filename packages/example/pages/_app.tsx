@@ -1,5 +1,8 @@
 import * as React from "react"
 import App, { NextAppContext } from "next/app"
+import "bootstrap/scss/bootstrap-reboot.scss"
+import "bootstrap/scss/bootstrap.scss"
+import "luna-prisma-tools/main.scss"
 
 export default class BK1CMSAppLayout extends App {
   public static async getInitialProps(c: NextAppContext) {

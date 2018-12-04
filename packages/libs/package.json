@@ -11,7 +11,8 @@
     "test": "yarn jest --config jest.unit.json",
     "build": "yarn tsc",
     "prepublish": "yarn build",
-    "watch": "yarn build --watch"
+    "watch": "yarn build --watch",
+    "build-css": "sh scripts/build-css.sh"
   },
   "dependencies": {
     "apollo": "^1.9.2",
@@ -83,6 +84,7 @@
     "@types/reactstrap": "^6.4.0",
     "@zeit/next-sass": "^1.0.1",
     "@zeit/next-typescript": "^1.1.1",
+    "autoprefixer": "^9.3.1",
     "axios": "^0.18.0",
     "cheerio": "^1.0.0-rc.2",
     "css-loader": "^1.0.0",
@@ -95,6 +97,7 @@
     "mkdirp": "^0.5.1",
     "node-sass": "^4.10.0",
     "nodemon": "^1.18.4",
+    "postcss-cli": "^6.0.1",
     "rollup": "^0.67.3",
     "ts-jest": "^23.10.4",
     "ts-node": "^7.0.1",

@@ -11,6 +11,7 @@ import {
   FragmentDefinitionNode,
   FieldNode,
   BREAK,
+  DirectiveNode,
 } from "graphql"
 
 interface FormInputFieldMeta {
@@ -28,6 +29,11 @@ interface FormDateInputFieldMeta extends FormInputFieldMeta {
 
 interface FormIDInputFieldMeta extends FormInputFieldMeta {
   kind: "FormIDInputFieldMeta"
+  label?: string
+}
+
+interface FormBooleanInputFieldMeta extends FormInputFieldMeta {
+  kind: "FormBooleanInputFieldMeta"
   label?: string
 }
 
@@ -50,6 +56,7 @@ export type FormMeta =
   | FormTextInputFieldMeta
   | FormIDInputFieldMeta
   | FormDateInputFieldMeta
+  | FormBooleanInputFieldMeta
 
 export function findTypeDefinitionInfoFromSchema(
   schema: DocumentNode,
@@ -127,6 +134,15 @@ export function findTypeDefinitionInfoFromSchema(
         path: pathname,
         typeName: currentTypeName,
       }
+    case "Boolean":
+      return {
+        isNonNull,
+        isEditable,
+        key,
+        kind: "FormBooleanInputFieldMeta",
+        path: pathname,
+        typeName: currentTypeName,
+      }
     default: {
       // find enum, scalar type if currentTypeName
       // is not Primitive data type
@@ -168,6 +184,36 @@ export function findTypeDefinitionInfoFromSchema(
     }
   }
 }
+
+export function getDirectiveArgs(directive: DirectiveNode) {
+  const result: { [key: string]: any } = {}
+
+  visit(directive, {
+    Argument: argumentNode => {
+      if (argumentNode.value && argumentNode.value.kind === "StringValue") {
+        result[argumentNode.name.value] = argumentNode.value.value
+      }
+    },
+  })
+
+  return result
+}
+
+export function getFormLabel(query: ASTNode) {
+  let label = ""
+  visit(query, {
+    Directive: node => {
+      if (node.name.value === FormDirectiveName) {
+        const args = getDirectiveArgs(node)
+        label = args.label
+        return BREAK
+      }
+    },
+  })
+
+  return label
+}
+
 export function getFormDataFieldKey(query: ASTNode): FieldNode | null {
   const key: string | undefined = undefined
   let fieldNode: FieldNode
@@ -221,9 +267,14 @@ export function parseSDLToFormMeta(
           return undefined
         } else if (node.name.value === InputDirectiveName) {
           // process each selection field
-          console.log(node.name.value, currentPath.length)
           const meta = findTypeDefinitionInfoFromSchema(schemaAST, currentPath)
+          // after meta from
+          // remote schema already extract
+          // check if meta is avaliable
+          // and then get label from directive args
           if (meta) {
+            const args = getDirectiveArgs(node)
+            meta.label = args.label
             result.push(meta)
           }
           return undefined
