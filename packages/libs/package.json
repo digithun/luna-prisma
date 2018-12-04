@@ -1,16 +1,16 @@
 {
   "name": "luna-prisma-tools",
-  "version": "1.0.0",
-  "main": "index.js",
+  "version": "1.0.1",
+  "main": "dist/index.js",
   "repository": "git@github.com:digithun/luna-prisma.git",
-  "private": true,
   "author": "pair <t.nitikarn@gmail.com>",
   "license": "MIT",
   "scripts": {
     "deploy": "yarn prisma deploy -e ./.env",
+    "clean": "sh scripts/clean.sh",
     "test": "yarn jest --config jest.unit.json",
     "build": "yarn tsc",
-    "prepublish": "yarn build",
+    "prepublish": "yarn build && yarn build-css",
     "watch": "yarn build --watch",
     "build-css": "sh scripts/build-css.sh"
   },

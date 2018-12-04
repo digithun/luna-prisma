@@ -93,15 +93,15 @@ export class GraphQLTableView<TItem, TVariables> extends React.Component<
                   {columnData.map((row, rowIndex) => {
                     return <td className="align-middle" key={rowIndex}>{row.value}</td>
                   })}
-                  <td style={{width: 100}} key={`action-${index}`} className="text-center">
+                  <td style={{width: 140}} key={`action-${index}`} className="text-center">
                     <button
-                      className="btn btn-info my-1 btn-block"
+                      className="btn btn-info my-1 mr-1"
                       onClick={this.handleOnEditClick(index)}
                     >
                       {"แก้ไข"}
                     </button>
                     <button
-                      className="btn btn-danger my-1 btn-block"
+                      className="btn btn-danger my-1"
                       onClick={this.handleOnDeleteClick(index, false)}
                     >
                       {"ลบ"}

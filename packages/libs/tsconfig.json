@@ -1,25 +1,26 @@
 {
-    "compilerOptions": {
-        "strictFunctionTypes": true,
-        "types": [
-            "node",
-            "jest"
-        ],
-        "experimentalDecorators": true,
-        "allowJs": true,
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "noEmitOnError": false,
-        "skipLibCheck": true,
-        "strictNullChecks": true,
-        "sourceMap": true,
-        "jsx": "react",
-        "target": "es2015",
-        "lib": [
-            "es2015",
-            "dom",
-            "esnext.asynciterable"
-        ],
-        "plugins": []
-    },
+  "compilerOptions": {
+    "strictFunctionTypes": true,
+    "types": ["node", "jest"],
+    "experimentalDecorators": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noEmitOnError": false,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "jsx": "react",
+    "target": "es2015",
+    "lib": ["es2015", "dom", "esnext.asynciterable"],
+    "plugins": [],
+    "outDir": "./dist",
+    "rootDir": "./"
+  },
+  "include": ["*.ts", "Form/**/*"],
+  "exclude": [
+      "node_modules",
+      "dist"
+    ]
 }

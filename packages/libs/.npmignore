@@ -1,0 +1,16 @@
+*.ts
+*.tsx
+!*.d.ts
+!*.js
+*.scss
+!dist/*.scss
+
+scripts
+jest.unit.json
+*.tgz
+postcss.config.ts
+yarn.lock
+__test__
+!dist
+tsconfig.json
+package
