@@ -934,10 +934,6 @@
     "@types/cheerio" "*"
     "@types/react" "*"
 
-"@types/estree@0.0.39":
-  version "0.0.39"
-  resolved "https://registry.npmjs.org/@types/estree/-/estree-0.0.39.tgz#e177e699ee1b8c22d23174caaa7422644389509f"
-
 "@types/events@*":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@types/events/-/events-1.2.0.tgz#81a6731ce4df43619e5c8c945383b3e62a89ea86"
@@ -2009,17 +2005,6 @@ autodll-webpack-plugin@0.4.2:
     webpack-merge "^4.1.0"
     webpack-sources "^1.0.1"
 
-autoprefixer@^9.3.1:
-  version "9.3.1"
-  resolved "https://registry.npmjs.org/autoprefixer/-/autoprefixer-9.3.1.tgz#71b622174de2b783d5fd99f9ad617b7a3c78443e"
-  dependencies:
-    browserslist "^4.3.3"
-    caniuse-lite "^1.0.30000898"
-    normalize-range "^0.1.2"
-    num2fraction "^1.2.2"
-    postcss "^7.0.5"
-    postcss-value-parser "^3.3.1"
-
 aws-lambda@^0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/aws-lambda/-/aws-lambda-0.1.2.tgz#19b1585075df31679597b976a5f1def61f12ccee"
@@ -2470,7 +2455,7 @@ browserify-zlib@^0.2.0:
   dependencies:
     pako "~1.0.5"
 
-browserslist@^4.1.0, browserslist@^4.3.3:
+browserslist@^4.1.0:
   version "4.3.4"
   resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-4.3.4.tgz#4477b737db6a1b07077275b24791e680d4300425"
   dependencies:
@@ -2695,10 +2680,6 @@ camelcase@^3.0.0:
 camelcase@^4.0.0, camelcase@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-4.1.0.tgz#d545635be1e33c542649c69173e5de6acfae34dd"
-
-caniuse-lite@^1.0.30000898:
-  version "1.0.30000912"
-  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30000912.tgz#08e650d4090a9c0ab06bfd2b46b7d3ad6dcaea28"
 
 caniuse-lite@^1.0.30000899:
   version "1.0.30000907"
@@ -7411,6 +7392,59 @@ lru-cache@^4.0.1, lru-cache@^4.1.1, lru-cache@^4.1.3:
     pseudomap "^1.0.2"
     yallist "^2.1.2"
 
+luna-prisma-tools@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.npmjs.org/luna-prisma-tools/-/luna-prisma-tools-1.0.0.tgz#0885c83002fdaf4c0261cb15bfd54385ae1c1bea"
+  dependencies:
+    apollo "^1.9.2"
+    apollo-boost "^0.1.16"
+    apollo-cache-inmemory "^1.3.5"
+    apollo-cli "^0.4.0"
+    apollo-client "^2.4.5"
+    apollo-link "^1.2.3"
+    apollo-link-http "^1.5.5"
+    apollo-upload-client "^9.0.0"
+    bootstrap "^4.1.3"
+    classnames "^2.2.6"
+    dotnet "^1.1.4"
+    draft-js "^0.10.5"
+    draft-js-export-html "^1.2.0"
+    express "^4.16.3"
+    express-graphql "^0.6.12"
+    graphql-import "^0.7.1"
+    graphql-resolver-codegen "^0.0.3"
+    graphql-tag "^2.10.0"
+    graphql-tools "^4.0.0"
+    graphql-upload "^8.0.0"
+    graphql-yoga "^1.16.2"
+    http-proxy "^1.17.0"
+    immutable "^3.8.2"
+    inversify "^4.13.0"
+    merge-graphql-schemas "^1.5.7"
+    mobx "^5.5.0"
+    mobx-react "^5.2.8"
+    moment "^2.22.2"
+    morgan "^1.9.1"
+    next "^7.0.1"
+    node-fetch "^2.2.0"
+    object-path "^0.11.4"
+    react "^16.7.0-alpha.2"
+    react-apollo "^2.2.4"
+    react-bootstrap-date-picker "^5.1.0"
+    react-dates "^18.1.0"
+    react-dom "^16.7.0-alpha.2"
+    react-draft-wysiwyg "^1.12.13"
+    react-dropzone "^6.0.2"
+    react-ladda "^6.0.0"
+    react-no-ssr "^1.1.0"
+    react-quill "^1.3.1"
+    react-rte "^0.16.1"
+    react-select "^2.1.0"
+    react-with-direction "^1.3.0"
+    reactstrap "^6.5.0"
+    reflect-metadata "^0.1.12"
+    winston "^3.1.0"
+
 make-dir@^1.0.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/make-dir/-/make-dir-1.3.0.tgz#79c1033b80515bd6d24ec9933e860ca75ee27f0c"
@@ -8161,10 +8195,6 @@ normalize-path@^2.0.0, normalize-path@^2.0.1, normalize-path@^2.1.1:
   dependencies:
     remove-trailing-separator "^1.0.1"
 
-normalize-range@^0.1.2:
-  version "0.1.2"
-  resolved "https://registry.npmjs.org/normalize-range/-/normalize-range-0.1.2.tgz#2d10c06bdfd312ea9777695a4d28439456b75942"
-
 normalize-url@2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-2.0.1.tgz#835a9da1551fa26f70e92329069a23aa6574d7e6"
@@ -8234,10 +8264,6 @@ nth-check@~1.0.1:
   resolved "https://registry.yarnpkg.com/nth-check/-/nth-check-1.0.2.tgz#b2bd295c37e3dd58a3bf0700376663ba4d9cf05c"
   dependencies:
     boolbase "~1.0.0"
-
-num2fraction@^1.2.2:
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/num2fraction/-/num2fraction-1.2.2.tgz#6f682b6a027a4e9ddfa4564cd2589d1d4e669ede"
 
 number-is-nan@^1.0.0:
   version "1.0.1"
@@ -8895,7 +8921,7 @@ postcss-scss@^2.0.0:
   dependencies:
     postcss "^7.0.0"
 
-postcss-value-parser@^3.3.0, postcss-value-parser@^3.3.1:
+postcss-value-parser@^3.3.0:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/postcss-value-parser/-/postcss-value-parser-3.3.1.tgz#9ff822547e2893213cf1c30efa51ac5fd1ba8281"
 
@@ -8915,7 +8941,7 @@ postcss@^7.0.0:
     source-map "^0.6.1"
     supports-color "^5.5.0"
 
-postcss@^7.0.2, postcss@^7.0.5, postcss@^7.0.6:
+postcss@^7.0.2, postcss@^7.0.6:
   version "7.0.6"
   resolved "https://registry.npmjs.org/postcss/-/postcss-7.0.6.tgz#6dcaa1e999cdd4a255dcd7d4d9547f4ca010cdc2"
   dependencies:
@@ -10165,13 +10191,6 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
   dependencies:
     hash-base "^3.0.0"
     inherits "^2.0.1"
-
-rollup@^0.67.3:
-  version "0.67.3"
-  resolved "https://registry.npmjs.org/rollup/-/rollup-0.67.3.tgz#55475b1b62c43220c3b4bd7edc5846233932f50b"
-  dependencies:
-    "@types/estree" "0.0.39"
-    "@types/node" "*"
 
 rst-selector-parser@^2.2.3:
   version "2.2.3"
