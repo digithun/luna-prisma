@@ -36,6 +36,7 @@ Array [
     "isNonNull": false,
     "key": "description",
     "kind": "FormTextInputFieldMeta",
+    "label": "Description",
     "path": "query.todo.description",
     "typeName": "String",
   },

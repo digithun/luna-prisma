@@ -24,7 +24,7 @@ export function createApolloClient(options: IApolloClientOptions) {
         [
           {
             // from TableView
-            test: d => !!d.name.value.match(/(column|value|lang|table)/),
+            test: d => !!d.name.value.match(/(column|value|lang|table|pagination|total)/),
           },
           {
             // from FormInput
@@ -53,21 +53,22 @@ export function createApolloClient(options: IApolloClientOptions) {
 }
 
 const TODOES_QUERY = gql`
-  query {
-    todoes {
-      id
+  query($skip: Int = 0, $first: Int = 10) {
+    data:todoes(first: $first, skip: $skip) @table {
+      id @column(lable: "ID")
       name @column(lable: "Name")
       description @column(lable: "Description")
       state @column(lable: "State")
       color @column(lable: "Color")
     }
+
   }
 `
 
 const TODOLIST_QUERY = gql`
   query {
     todoLists {
-      id
+      id  @column(lable: "ID")
       name @column(lable: "Name")
     }
   }
@@ -91,7 +92,13 @@ export default class extends React.Component {
 
         <div className="py-3 px-3">
           <h4>{"Todo"}</h4>
-          <GraphQLTableView
+          {/* <GraphQLTableView
+            variables={
+              {
+                first: 5,
+                skip: 0
+              }
+            }
             client={client}
             query={TODOES_QUERY}
             introspection={require("../static/luna-schema.json")}
@@ -99,7 +106,13 @@ export default class extends React.Component {
             onEditClick={item => {
               Router.push(`/todo?id=${item.id}`)
             }}
-          />
+            pagination={
+              {
+                currentPage: 1,
+                resultPage: 2
+              }
+            }
+          /> */}
         </div>
       </div>
     )

@@ -96,21 +96,21 @@ const FromGroup: React.SFC<FromGroupPropTypes> = ({
               <div style={{ width: "48%" }} className="input__loading--line" />
             </>
           ) : (
-            fieldInputs.map(field => {
-              const Field = fieldRenderer[field.kind]
-              return (
-                <div className="form-group" key={field.key}>
-                  <label
-                    htmlFor={field.key}
-                    dangerouslySetInnerHTML={{
-                      __html: field.label || field.key,
-                    }}
-                  />
-                  <Field meta={field} />
-                </div>
-              )
-            })
-          )}
+              fieldInputs.map(field => {
+                const Field = fieldRenderer[field.kind]
+                return (
+                  <div className="form-group" key={field.key}>
+                    <label
+                      htmlFor={field.key}
+                      dangerouslySetInnerHTML={{
+                        __html: field.label || field.key,
+                      }}
+                    />
+                    <Field meta={field} />
+                  </div>
+                )
+              })
+            )}
           <div className="text-right">
             <button className="btn btn-secondary mr-2">{"Cancel"}</button>
             <button
@@ -124,8 +124,8 @@ const FromGroup: React.SFC<FromGroupPropTypes> = ({
               {isMutateLoading ? (
                 <div className="loader" />
               ) : (
-                <span>{isDirty ? "Save" : "Saved"}</span>
-              )}
+                  <span>{isDirty ? "Save" : "Saved"}</span>
+                )}
             </button>
           </div>
         </div>

@@ -1,19 +1,25 @@
 import {
   ASTNode,
+  visit,
   IntrospectionQuery,
-  FieldDefinitionNode,
+  buildClientSchema,
+  printSchema,
+  parse,
   DocumentNode,
-  SelectionSetNode,
+  DirectiveNode,
+  ScalarTypeDefinitionNode,
+  EnumTypeDefinitionNode,
+  FragmentDefinitionNode,
+  FieldNode,
+  BREAK
 } from "graphql"
 
-import { visit, parse } from "graphql/language"
-import { buildClientSchema, printSchema } from "graphql/utilities"
-
 const objectPath = require("object-path")
-interface TableCommonColumnInfo {
+export interface TableCommonColumnInfo {
   key: string
-  label: string
+  label?: string
   path: string
+  desacrption?: string
 }
 interface TableStringColumnInfo extends TableCommonColumnInfo {
   kind: "TableStringColumnInfo"
@@ -29,215 +35,328 @@ interface TableEnumColumnInfo extends TableCommonColumnInfo {
   kind: "TableEnumColumnInfo"
   enumValues: string[]
 }
+interface TableDateColumnInfo extends TableCommonColumnInfo {
+  kind: "TableDateColumnInfo"
+
+}
+
 export type TableColumnInfo =
-  | TableStringColumnInfo
-  | TableIntColumnInfo
-  | TableBooleanColumnInfo
-  | TableEnumColumnInfo
+  TableStringColumnInfo |
+  TableIntColumnInfo |
+  TableBooleanColumnInfo |
+  TableEnumColumnInfo |
+  TableDateColumnInfo
+
+export interface TablePaginationInfo {
+  path: string
+  total: number
+}
+
+export function getDataPath(query: ASTNode): string {
+  let result
+  let fieldNode: FieldNode | undefined
+
+  visit(query, {
+    Directive: {
+      enter: node => {
+        if (node.name.value === "table") {
+          return BREAK
+        }
+      },
+    },
+    Field: {
+      enter: node => {
+        fieldNode = node
+      },
+    },
+  })
+
+  if (fieldNode) {
+    if (fieldNode.alias) {
+      result = fieldNode.alias.value
+    } else {
+      result = fieldNode.name.value
+    }
+  }
+  if (result === null) {
+    throw new Error("table node not found")
+  }
+  return result
+}
 
 export function parseSDLToTableColumnInfos(
   query: ASTNode,
-  schemaIntrospection: IntrospectionQuery,
-  datasource: any[]
-): any[] {
-  const columnInfos = getTableHeaderColumnInfo(query, schemaIntrospection)
+  schemaIntrospection: IntrospectionQuery
+) {
+  const result: TableColumnInfo[] = []
+  let totalPath = ""
+  const schemaAST = parse(printSchema(buildClientSchema(schemaIntrospection)))
 
-  if (datasource === undefined) {
-    return [columnInfos]
-  }
-  const tempData = getDataFromDatasourceItem(datasource, columnInfos)
+  // find every form in query
+  let shouldVisitFieldNode = true
+  const currentPath: ASTNode[] = []
 
-  return [columnInfos, ...tempData]
+  visit(query, {
+    FragmentDefinition: {
+      enter: () => false,
+    },
+    OperationDefinition: {
+      enter: node => {
+        currentPath.push(node)
+      },
+      leave: node => {
+        currentPath.pop()
+      },
+    },
+    Directive: {
+      enter: (node, parent) => {
+        if (node.name.value === "table" || node.name.value === "pagination") {
+          shouldVisitFieldNode = true
+          return undefined
+        } else if (node.name.value === "column") {
+          const meta = getTypeDefinitionInfoFromSchema(schemaAST, currentPath)
+          if (meta) {
+            const args = getArgsFromDirective(node)
+            meta.label = args.label
+            if (args.desacrption) {
+              meta.desacrption = args.desacrption
+            }
+            result.push(meta)
+          }
+          return undefined
+        } else if (node.name.value === "total") {
+          const meta = getTypeDefinitionInfoFromSchema(schemaAST, currentPath)
+          if (meta) {
+            totalPath = meta.path
+          }
+          return undefined
+        } else {
+          shouldVisitFieldNode = false
+          return false
+        }
+      },
+    },
+    FragmentSpread: {
+      enter: fragmentSpreadNode => {
+        // ถ้ามี fragment spread ให้เอา Field ด้านในทั้งหมด
+        // ของ Fragment spread มา push กลับไปใส่ path
+        // เพื่อทำให้ผลลัพธ์ออกมาเหมือนเดิม
+        const fragmentName = fragmentSpreadNode.name.value
+        let currentFragmentDefinitionNode: FragmentDefinitionNode | null = null
+        let currentField: FieldNode | null = null
+        // หา Fragment Definition ก่อน
+        visit(query, {
+          FragmentDefinition: {
+            enter: fragmentDefinitionNode => {
+              if (fragmentDefinitionNode.name.value === fragmentName) {
+                currentFragmentDefinitionNode = fragmentDefinitionNode
+                return undefined
+              } else {
+                return false
+              }
+            },
+            leave: fragmentDefinitionNode => {
+              currentFragmentDefinitionNode = null
+            },
+          },
+          Field: {
+            enter: fieldNode => {
+              if (currentFragmentDefinitionNode) {
+                currentField = fieldNode
+                currentPath.push(fieldNode)
+              }
+            },
+            leave: fieldNode => {
+              currentField = null
+              if (currentFragmentDefinitionNode) {
+                currentPath.pop()
+              }
+            },
+          },
+          Directive: {
+            enter: directiveNode => {
+              if (
+                currentFragmentDefinitionNode &&
+                currentField &&
+                directiveNode.name.value === "column"
+              ) {
+                const meta = getTypeDefinitionInfoFromSchema(
+                  schemaAST,
+                  currentPath
+                )
+                if (meta) {
+                  result.push(meta)
+                }
+              }
+            },
+          },
+        })
+      },
+    },
+    Field: {
+      enter: node => {
+        if (shouldVisitFieldNode) {
+          currentPath.push(node)
+        } else {
+          return false
+        }
+      },
+      leave: () => {
+        shouldVisitFieldNode = true
+        currentPath.pop()
+      },
+    },
+  })
+
+  return { columnInfos: result, totalPath }
 }
 
-export function getTableHeaderColumnInfo(
-  query: ASTNode,
-  schemaIntrospection: IntrospectionQuery
-): TableColumnInfo[] {
-  let columnInfos: TableColumnInfo[] = []
-  const clientSchemaAST = parse(
-    printSchema(buildClientSchema(schemaIntrospection))
-  )
-  visit(query, {
-    OperationDefinition(node) {
-      if (node.operation === "query") {
-        columnInfos = getColumnInfo(
-          "query",
-          node.selectionSet,
-          [],
-          clientSchemaAST
-        )
+export function getArgsFromDirective(directive: DirectiveNode) {
+  const result: { [key: string]: any } = {}
+  visit(directive, {
+    Argument: argumentNode => {
+      if (argumentNode.value && argumentNode.value.kind === "StringValue") {
+        result[argumentNode.name.value] = argumentNode.value.value
       }
     },
   })
-  return columnInfos
+  return result
 }
 
-function getColumnInfo(
-  path: string,
-  sectionNode: SelectionSetNode,
-  fieldDefinition: FieldDefinitionNode[],
-  schemaAST: DocumentNode
-): TableColumnInfo[] {
-  let result: TableColumnInfo[] = []
-  sectionNode.selections.map(section => {
-    if (section.kind === "Field") {
-      if (section.directives) {
-        section.directives.map(directive => {
-          if (directive.arguments) {
-            directive.arguments.map(argument => {
-              if (argument.value.kind === "StringValue") {
-                const data = getNameTypeValue(
-                  path,
-                  section.name.value,
-                  argument.value.value,
-                  fieldDefinition,
-                  schemaAST
-                )
+export function getTypeDefinitionInfoFromSchema(
+  schema: DocumentNode,
+  path: ASTNode[]
+): TableColumnInfo | undefined {
+  let currentTypeName: string | null = null
 
-                if (data !== undefined) {
-                  result.push(data)
-                }
-              }
-            })
-          }
-        })
+  const _path = path.map(p => p)
+  // @ts-ignore
+  const pathname = _path
+    // @ts-ignore
+    .filter(n => n.alias || n.name || n.operation)
+    .map(n => {
+      // @ts-ignore
+      if (n.alias) {
+        // @ts-ignore
+        return n.alias.value
       }
-      if (section.selectionSet) {
-        const tempFieldDefination = getFieldDefinitionSchemaIntrospection(
-          section.name.value,
-          schemaAST
-        )
+      // @ts-ignore
+      return n.operation || n.name.value
+    })
+    .join(".")
 
-        if (tempFieldDefination != null && tempFieldDefination.length > 0) {
-          const tempObjectTypeDefination = getObjectTypeDefinitionSchemaIntrospection(
-            tempFieldDefination,
-            schemaAST
-          )
-          result = [
-            ...result,
-            ...getColumnInfo(
-              path != null
-                ? path + "." + section.name.value
-                : section.name.value,
-              section.selectionSet,
-              tempObjectTypeDefination,
-              schemaAST
-            ),
-          ]
-        } else {
-          throw new Error(`Introspection Query Type not found`)
+  let key: string = ""
+
+  let focusObjectDefinition = schema.definitions.find(
+    n => n.kind === "ObjectTypeDefinition" && n.name.value === "Query"
+  )
+
+  _path.shift()
+
+  while (_path.length) {
+    if (!focusObjectDefinition) {
+      throw new Error("Query type not found")
+    }
+    // @ts-ignore
+    key = _path[0].name.value
+    visit(focusObjectDefinition, {
+      FieldDefinition: {
+        enter: n => {
+          if (n.name.value === key) {
+            return undefined
+          } else {
+            return false
+          }
+        },
+      },
+      NamedType: n => {
+        currentTypeName = n.name.value
+      }
+    })
+    focusObjectDefinition = schema.definitions.find(
+      n => n.kind === "ObjectTypeDefinition" && n.name.value === currentTypeName
+    )
+
+    _path.shift()
+  }
+  if (!currentTypeName) {
+    throw new Error(`Cannot resolve typename ${pathname} from ${pathname}`)
+  }
+
+  // Process result from type
+  // and return FieldMeta
+  switch (currentTypeName) {
+    case "ID":
+      return {
+        path: pathname,
+        kind: "TableStringColumnInfo",
+        key,
+      }
+    case "String":
+      return {
+        path: pathname,
+        kind: "TableStringColumnInfo",
+        key,
+      }
+    case "Boolean":
+      return {
+        key,
+        kind: "TableBooleanColumnInfo",
+        path: pathname,
+      }
+    case "Int":
+      return {
+        key,
+        kind: "TableIntColumnInfo",
+        path: pathname,
+      }
+    case "Date":
+      return {
+        path: pathname,
+        kind: "TableDateColumnInfo",
+        key
+      }
+    default: {
+      // find enum, scalar type if currentTypeName
+      // is not Primitive data type
+      const abstractType = schema.definitions.find(
+        (n): n is ScalarTypeDefinitionNode | EnumTypeDefinitionNode =>
+          (n.kind === "ScalarTypeDefinition" ||
+            n.kind === "EnumTypeDefinition") &&
+          n.name.value === currentTypeName
+      )
+      if (!abstractType) {
+        throw new Error(
+          `Cannot find type ${currentTypeName} in schema ${pathname}`
+        )
+      }
+      if (abstractType.kind === "EnumTypeDefinition") {
+        return {
+          path: pathname,
+          kind: "TableEnumColumnInfo",
+          key,
+          enumValues: abstractType.values
+            ? abstractType.values.map(v => v.name.value)
+            : [],
+        }
+      } else {
+        // Any scalar type that unknown
+        // will support as Textinput form data
+        return {
+          key,
+          kind: "TableStringColumnInfo",
+          path: pathname
         }
       }
     }
-  })
-  return result
+  }
 }
 
-function getFieldDefinitionSchemaIntrospection(
-  nameSearch: string,
-  schemaAST: DocumentNode
-): string {
-  let result: string = ""
-  visit(schemaAST, {
-    FieldDefinition(node) {
-      if (node.name.value === nameSearch) {
-        const nameType =
-          node.type.kind === "NonNullType" ? node.type.type : node.type
-        if (nameType.kind === "ListType") {
-          const listType = nameType.type
-          if (listType.kind === "NamedType") {
-            result = listType.name.value
-          }
-        }
-      }
-    },
-  })
-  return result
-}
-
-function getObjectTypeDefinitionSchemaIntrospection(
-  nameSearch: string,
-  schemaAST: DocumentNode
-): FieldDefinitionNode[] {
-  let result: FieldDefinitionNode[] = []
-  visit(schemaAST, {
-    ObjectTypeDefinition(node) {
-      if (node.name.value === nameSearch) {
-        result = node.fields as FieldDefinitionNode[]
-      }
-    },
-  })
-  return result
-}
-
-function getNameTypeValue(
-  path: string,
-  nameSearch: string,
-  label: string,
-  fieldDefinition: FieldDefinitionNode[],
-  schemaAST: DocumentNode
-): TableColumnInfo | undefined {
-  let result: TableColumnInfo | undefined
-  fieldDefinition.map(m => {
-    visit(m, {
-      FieldDefinition(node) {
-        if (m.name.kind === "Name" && m.name.value === nameSearch) {
-          const nameType =
-            node.type.kind === "NonNullType" ? node.type.type : node.type
-          if (nameType.kind === "NamedType") {
-            const name = nameType.name
-            if (name.kind === "Name") {
-              if (name.value === "String" || name.value === "ID") {
-                result = {
-                  path: path + "." + nameSearch,
-                  kind: "TableStringColumnInfo",
-                  key: nameSearch,
-                  label,
-                }
-              } else if (name.value === "Boolean") {
-                result = {
-                  path: path + "." + nameSearch,
-                  kind: "TableBooleanColumnInfo",
-                  key: nameSearch,
-                  label,
-                }
-              } else if (name.value.indexOf("Enum") != null) {
-                result = {
-                  path: path + "." + nameSearch,
-                  kind: "TableEnumColumnInfo",
-                  key: nameSearch,
-                  label,
-                  enumValues: getEnumColumnInfoValue(name.value, schemaAST),
-                }
-              }
-            }
-          }
-        }
-      },
-    })
-  })
-
-  return result
-}
-
-function getEnumColumnInfoValue(
-  nameSearch: string,
-  schemaAST: DocumentNode
-): string[] {
-  const enumValues: string[] = []
-  visit(schemaAST, {
-    EnumTypeDefinition(node) {
-      if (node.name.value === nameSearch && node.values) {
-        node.values.map(value => {
-          if (value.name != null) {
-            enumValues.push(value.name.value)
-          }
-        })
-      }
-    },
-  })
-  return enumValues
+export function getDatasourceItemPath(path: string) {
+  return path
+    .split(".")
+    .filter((_, i) => i > 1)
+    .join(".")
 }
 
 export function getDataFromDatasourceItem(
@@ -250,7 +369,9 @@ export function getDataFromDatasourceItem(
         if (
           column.kind === "TableStringColumnInfo" ||
           column.kind === "TableBooleanColumnInfo" ||
-          column.kind === "TableEnumColumnInfo"
+          column.kind === "TableEnumColumnInfo" ||
+          column.kind === "TableDateColumnInfo" ||
+          column.kind === "TableIntColumnInfo"
         ) {
           const value = objectPath.get(data, getDatasourceItemPath(column.path))
           if (value === undefined) {
@@ -259,7 +380,7 @@ export function getDataFromDatasourceItem(
           if (column.kind === "TableBooleanColumnInfo") {
             fieldDataList.push({
               path: column.path,
-              value, // ? "true" : "false",
+              value: value ? "true" : "false",
             })
           } else {
             fieldDataList.push({
@@ -273,30 +394,4 @@ export function getDataFromDatasourceItem(
       []
     )
   })
-}
-
-function getDatasourceItemPath(path: string) {
-  return path
-    .split(".")
-    .filter((_, i) => i > 1)
-    .join(".")
-}
-
-export function getTablePath(query: ASTNode): string {
-  let result
-  visit(query, {
-    OperationDefinition(node) {
-      if (node.operation === "query") {
-        node.selectionSet.selections.map(selection => {
-          if (selection.kind === "Field") {
-            result = selection.name.value
-          }
-        })
-      }
-    },
-  })
-  if (result === null) {
-    throw new Error("table node not found")
-  }
-  return result
 }

@@ -1,30 +1,65 @@
 import gql from "graphql-tag"
 import {
   parseSDLToTableColumnInfos,
-  getTableHeaderColumnInfo,
   getDataFromDatasourceItem,
+  getDataPath
 } from "../genarateTableMetaFromSDL"
 
-describe("grnarateFromSDLTest", () => {
+describe("genarateFromSDLTest", () => {
   it("should parse column SDL corretly", () => {
     expect(
       parseSDLToTableColumnInfos(
         gql`
           query {
             todoLists {
-              id @column(lable: "id")
-              name @column(lable: "Name")
+              id @column(label: "id")
+              name @column(label: "Name")
               todoes {
                 id
               }
             }
           }
         `,
-        require("./luna-schema"),
-        require("./mock-data-todoLits").todoLists
+        require("./luna-schema")
       )
-    ).toEqual([
-      [
+    ).toEqual(
+      {
+        columnInfos: [
+          {
+            kind: "TableStringColumnInfo",
+            key: "id",
+            label: "id",
+            path: "query.todoLists.id",
+          },
+          {
+            kind: "TableStringColumnInfo",
+            key: "name",
+            label: "Name",
+            path: "query.todoLists.name",
+          },
+        ],
+        totalPath: ""
+      }
+    )
+  })
+  it("should table header corretly", () => {
+    expect(
+      parseSDLToTableColumnInfos(
+        gql`
+          query {
+            todoLists {
+              id @column(label: "id")
+              name @column(label: "Name")
+              todoes {
+                id
+              }
+            }
+          }
+        `,
+        require("./luna-schema")
+      )
+    ).toEqual({
+      columnInfos: [
         {
           kind: "TableStringColumnInfo",
           key: "id",
@@ -38,67 +73,17 @@ describe("grnarateFromSDLTest", () => {
           path: "query.todoLists.name",
         },
       ],
-      [
-        {
-          path: "query.todoLists.id",
-          value: "todo_list_id_0",
-        },
-        {
-          path: "query.todoLists.name",
-          value: "todo_list_name_0",
-        },
-      ],
-      [
-        {
-          path: "query.todoLists.id",
-          value: "todo_list_id_1",
-        },
-        {
-          path: "query.todoLists.name",
-          value: "todo_list_name_1",
-        },
-      ],
-    ])
-  })
-  it("should table header corretly", () => {
-    expect(
-      getTableHeaderColumnInfo(
-        gql`
-          query {
-            todoLists {
-              id @column(lable: "id")
-              name @column(lable: "Name")
-              todoes {
-                id
-              }
-            }
-          }
-        `,
-        require("./luna-schema")
-      )
-    ).toEqual([
-      {
-        kind: "TableStringColumnInfo",
-        key: "id",
-        label: "id",
-        path: "query.todoLists.id",
-      },
-      {
-        kind: "TableStringColumnInfo",
-        key: "name",
-        label: "Name",
-        path: "query.todoLists.name",
-      },
-    ])
+      totalPath: ""
+    })
 
     // Test Enum and Boolean Type
     expect(
-      getTableHeaderColumnInfo(
+      parseSDLToTableColumnInfos(
         gql`
           query {
             todoes {
               id
-              name @column(lable: "Name")
+              name @column(label: "Name")
               state @column(label: "State")
               color @column(label: "Color")
             }
@@ -106,27 +91,30 @@ describe("grnarateFromSDLTest", () => {
         `,
         require("./luna-schema")
       )
-    ).toEqual([
-      {
-        kind: "TableStringColumnInfo",
-        key: "name",
-        label: "Name",
-        path: "query.todoes.name",
-      },
-      {
-        kind: "TableBooleanColumnInfo",
-        key: "state",
-        label: "State",
-        path: "query.todoes.state",
-      },
-      {
-        kind: "TableEnumColumnInfo",
-        key: "color",
-        label: "Color",
-        path: "query.todoes.color",
-        enumValues: ["RED", "BLUE", "GREEN"],
-      },
-    ])
+    ).toEqual({
+      columnInfos: [
+        {
+          kind: "TableStringColumnInfo",
+          key: "name",
+          label: "Name",
+          path: "query.todoes.name",
+        },
+        {
+          kind: "TableBooleanColumnInfo",
+          key: "state",
+          label: "State",
+          path: "query.todoes.state",
+        },
+        {
+          kind: "TableEnumColumnInfo",
+          key: "color",
+          label: "Color",
+          path: "query.todoes.color",
+          enumValues: ["RED", "BLUE", "GREEN"],
+        },
+      ],
+      totalPath: ""
+    })
   })
   it("should get Data corretly", () => {
     const columnInfos: any = [
@@ -159,7 +147,7 @@ describe("grnarateFromSDLTest", () => {
         },
         {
           path: "query.todos.state",
-          value: false,
+          value: "false",
         },
         {
           path: "query.todos.color",
@@ -173,7 +161,7 @@ describe("grnarateFromSDLTest", () => {
         },
         {
           path: "query.todos.state",
-          value: false,
+          value: "false",
         },
         {
           path: "query.todos.color",
@@ -187,12 +175,12 @@ describe("grnarateFromSDLTest", () => {
   })
   it("should parse column SDL invalid", () => {
     expect(() =>
-      getTableHeaderColumnInfo(
+      parseSDLToTableColumnInfos(
         gql`
           query {
             stodoLists {
-              id @column(lable: "id")
-              name @column(lable: "Name")
+              id @column(label: "id")
+              name @column(label: "Name")
               todos {
                 id
               }
@@ -204,12 +192,12 @@ describe("grnarateFromSDLTest", () => {
     ).toThrow()
 
     expect(() =>
-      getTableHeaderColumnInfo(
+      parseSDLToTableColumnInfos(
         gql`
           query {
             todoLists {
-              ids @column(lable: "id")
-              name @column(lable: "Name")
+              ids @column(label: "id")
+              name @column(label: "Name")
               todos {
                 id
               }
@@ -242,5 +230,22 @@ describe("grnarateFromSDLTest", () => {
         columnInfos
       )
     ).toThrow()
+  })
+  it("should parse table path", () => {
+    expect(
+      getDataPath(
+        gql`
+          query {
+            data: todoLists @table {
+              id @column(label: "id")
+              name @column(label: "Name")
+              todoes {
+                id
+              }
+            }
+          }
+        `
+      )
+    ).toEqual("data")
   })
 })
