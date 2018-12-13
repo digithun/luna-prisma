@@ -18,7 +18,7 @@
     "outDir": "./dist",
     "rootDir": "./"
   },
-  "include": ["*.ts", "Form/**/*"],
+  "include": ["*.ts", "*.tsx", "Form/**/*"],
   "exclude": [
       "node_modules",
       "dist"

@@ -1,0 +1,19 @@
+enum ColorEnum {
+    RED
+    BLUE
+    GREEN
+}
+
+type Todo {
+    id: ID! @unique
+    name: String!
+    description: String
+    state: Boolean @default(value: false)
+    color: ColorEnum @default(value: BLUE)
+}
+
+type TodoList {
+    id: ID! @unique
+    name: String!
+    todos: [Todo!]!
+}
