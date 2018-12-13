@@ -29,6 +29,7 @@ export const PaginationItem: React.SFC<PaginationItemPropTypes> = (
         return (
             <li className={props.className}>
                 <a
+                    className="page-link"
                     onClick={bindClick(props.bindClickPage)}
                 >
                     {`${props.pageNumber}`}
@@ -39,6 +40,7 @@ export const PaginationItem: React.SFC<PaginationItemPropTypes> = (
     return (
         <li className={props.className}>
             <a
+                className="page-link"
                 onClick={bindClick(props.bindClickPage)}
             >
                 {string}
@@ -62,7 +64,7 @@ export const Pagination: React.SFC<PaginationPropTypes> = props => {
             {...props}
             pageNumber={props.currentPage !== 1 ? props.currentPage - 1 : props.currentPage}
             bindClickPage={1}
-            className={props.currentPage !== 1 ? "active" : "disable"}
+            className={props.currentPage !== 1 ? "page-item" : "page-item disabled"}
             type={PAGINATION_ITEM_TYPE.PREVIOUS}
             key={PAGINATION_ITEM_TYPE.PREVIOUS}
         />)
@@ -71,7 +73,7 @@ export const Pagination: React.SFC<PaginationPropTypes> = props => {
     if (props.currentPage - 3 < 1) {
         for (let i = props.currentPage - 3; i < props.currentPage + 2; i++) {
             if (i < props.lastPage && i >= 1) {
-                const currentPageclassName = props.currentPage === i ? "active" : ""
+                const currentPageclassName = props.currentPage === i ? "page-item active" : "page-item"
                 pagesNumber.push(
                     <PaginationItem
                         key={i}
@@ -98,7 +100,7 @@ export const Pagination: React.SFC<PaginationPropTypes> = props => {
         if (props.currentPage - 2 === 2) {
             for (let i = props.currentPage - 2; i < props.currentPage - 1; i++) {
                 if (i < props.lastPage && i >= 1) {
-                    const pageClassName = `${props.currentPage === i ? "active" : ""}`
+                    const pageClassName = `${props.currentPage === i ? "page-item active" : "page-item"}`
                     pagesNumber.push(
                         <PaginationItem
                             key={i}
@@ -113,13 +115,13 @@ export const Pagination: React.SFC<PaginationPropTypes> = props => {
             }
         } else {
             pagesNumber.push(
-                <li className="disabled"><a >{"..."}</a></li>
+                <li className="page-item disabled"><a className="page-link" >{"..."}</a></li>
             )
         }
 
         for (let i = props.currentPage - 1; i < props.currentPage + 2; i++) {
             if (i < props.lastPage && i >= 1) {
-                const pageClassName = `${props.currentPage === i ? "active" : ""}`
+                const pageClassName = `${props.currentPage === i ? "page-item active" : "page-item"}`
                 pagesNumber.push(
                     <PaginationItem
                         key={i}
@@ -152,12 +154,12 @@ export const Pagination: React.SFC<PaginationPropTypes> = props => {
             }
         } else {
             pagesNumber.push(
-                <li className="disabled"><a >{"..."}</a></li>
+                <li className="page-item disabled"><a className="page-link">{"..."}</a></li>
             )
         }
     }
 
-    const className = props.currentPage === props.lastPage ? "active" : ""
+    const className = props.currentPage === props.lastPage ? "page-item active" : "page-item"
     pagesNumber.push(
         <PaginationItem
             key={"latest"}
@@ -175,12 +177,15 @@ export const Pagination: React.SFC<PaginationPropTypes> = props => {
             {...props}
             pageNumber={props.currentPage !== props.lastPage ? props.currentPage + 1 : props.currentPage}
             bindClickPage={props.currentPage + 1}
-            className={props.currentPage !== props.lastPage ? "active" : "disable"}
+            className={props.currentPage !== props.lastPage ? "page-item" : "page-item disabled"}
             type={PAGINATION_ITEM_TYPE.NEXT}
             key={PAGINATION_ITEM_TYPE.NEXT}
         />)
+
     return (
-        <div>
-            <ul className="pagination">{pagesNumber}</ul>
-        </div>)
+        <nav aria-label="...">
+            <ul className="pagination">
+                {pagesNumber}
+            </ul>
+        </nav>)
 }

@@ -2,10 +2,10 @@ import "isomorphic-fetch"
 import * as React from "react"
 import gql from "graphql-tag"
 import { concat, ApolloLink } from "apollo-link"
-import { GraphQLTableView } from "luna-prisma-tools"
 import { ApolloClient } from "apollo-boost"
 import { InMemoryCache } from "apollo-cache-inmemory"
 
+import { GraphQLTableView } from "../../libs/dist/index"
 import { removeDirectivesFromDocument } from "apollo-utilities"
 import { createUploadLink } from "apollo-upload-client"
 import Router from "next/router"
@@ -55,21 +55,25 @@ export function createApolloClient(options: IApolloClientOptions) {
 const TODOES_QUERY = gql`
   query($skip: Int = 0, $first: Int = 10) {
     data:todoes(first: $first, skip: $skip) @table {
-      id @column(lable: "ID")
-      name @column(lable: "Name")
-      description @column(lable: "Description")
-      state @column(lable: "State")
-      color @column(lable: "Color")
+      id @column(label: "ID")
+      name @column(label: "Name")
+      description @column(label: "Description")
+      state @column(label: "State")
+      color @column(label: "Color")
     }
-
+    count: todoesConnection @pagination {
+      aggregate {
+        count @total
+      }
+    }
   }
 `
 
 const TODOLIST_QUERY = gql`
   query {
-    todoLists {
-      id  @column(lable: "ID")
-      name @column(lable: "Name")
+    data:todoLists @table {
+      id  @column(label: "ID")
+      name @column(label: "Name")
     }
   }
 `
@@ -92,7 +96,7 @@ export default class extends React.Component {
 
         <div className="py-3 px-3">
           <h4>{"Todo"}</h4>
-          {/* <GraphQLTableView
+          <GraphQLTableView
             variables={
               {
                 first: 5,
@@ -109,10 +113,10 @@ export default class extends React.Component {
             pagination={
               {
                 currentPage: 1,
-                resultPage: 2
+                resultPerPage: 10
               }
             }
-          /> */}
+          />
         </div>
       </div>
     )

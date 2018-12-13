@@ -71,7 +71,8 @@ export class GraphQLTableView<TItem, TVariables> extends React.Component<
 
   public async fetch() {
     const tableInfo = parseSDLToTableColumnInfos(this.props.query, this.props.introspection)
-    this.setState({ tableColumnInfo: tableInfo.columnInfos, totalPath: tableInfo.totalPath })
+    const totalPath = tableInfo.totalPath.replace("query.", "")
+    this.setState({ tableColumnInfo: tableInfo.columnInfos, totalPath })
 
     const dataKey = getDataPath(this.props.query)
     const result = this.props.client.watchQuery({
@@ -89,7 +90,7 @@ export class GraphQLTableView<TItem, TVariables> extends React.Component<
           data[dataKey],
           this.state.tableColumnInfo
         ),
-        total: this.state.totalPath ? objectPath(data, this.state.totalPath) : 0,
+        total: this.state.totalPath ? objectPath.get(data, this.state.totalPath) : 0,
         rawDatasource: data[dataKey],
         loading,
       })
@@ -137,7 +138,7 @@ export class GraphQLTableView<TItem, TVariables> extends React.Component<
           <Pagination
             currentPage={this.props.pagination!.currentPage}
             totalPage={this.state.total || 0}
-            lastPage={Math.ceil(this.state.total! / this.props.pagination!.resultPerPage)}
+            lastPage={this.state.total ? Math.ceil(this.state.total / this.props.pagination!.resultPerPage) : 0}
             onClick={this.handleOnPaginationClick}
           />}
       </div>

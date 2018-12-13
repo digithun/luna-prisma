@@ -363,6 +363,9 @@ export function getDataFromDatasourceItem(
   datasource: any[],
   columns: TableColumnInfo[]
 ): Array<Array<{ path: string; value: string }>> {
+  if (datasource === undefined || datasource.length === 0) {
+    return []
+  }
   return datasource.map(data => {
     return columns.reduce<Array<{ path: string; value: string }>>(
       (fieldDataList, column) => {
