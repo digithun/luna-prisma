@@ -29,7 +29,7 @@ class GraphQLTableHeader extends React.Component<GraphQLTableHeaderProps> {
 
 export interface TablePagination {
   currentPage: number
-  resultPage: number
+  resultPerPage: number
 }
 
 export interface IGraphQLTableViewPropTypes<TItem = any, TVariables = any> {
@@ -135,9 +135,9 @@ export class GraphQLTableView<TItem, TVariables> extends React.Component<
         {!this.props.pagination && this.state.total === 0 ?
           null :
           <Pagination
-            currentPage={this.props.pagination.currentPage}
-            totalPage={this.state.total}
-            lastPage={(this.state.total - 1) * this.props.pagination.resultPage + 1}
+            currentPage={this.props.pagination!.currentPage}
+            totalPage={this.state.total || 0}
+            lastPage={Math.ceil(this.state.total! / this.props.pagination!.resultPerPage)}
             onClick={this.handleOnPaginationClick}
           />}
       </div>
