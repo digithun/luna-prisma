@@ -5,7 +5,7 @@ import { concat, ApolloLink } from "apollo-link"
 import { ApolloClient } from "apollo-boost"
 import { InMemoryCache } from "apollo-cache-inmemory"
 
-import { GraphQLTableView } from "../../libs/dist/index"
+import { GraphQLTableView } from "luna-prisma-tools"
 import { removeDirectivesFromDocument } from "apollo-utilities"
 import { createUploadLink } from "apollo-upload-client"
 import Router from "next/router"
@@ -79,10 +79,15 @@ const TODOLIST_QUERY = gql`
 `
 
 export default class extends React.Component {
+
   public render() {
     const client = createApolloClient({
       uri: "http://localhost:4466/luna/default",
     })
+
+    function onPaginationClick(data) {
+      Router.push(`?page=${data}`)
+    }
     return (
       <div className="title">
         <div className="py-3 px-3">

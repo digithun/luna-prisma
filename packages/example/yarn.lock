@@ -7839,10 +7839,10 @@ lru-cache@^4.0.1, lru-cache@^4.1.1, lru-cache@^4.1.3:
     pseudomap "^1.0.2"
     yallist "^2.1.2"
 
-luna-prisma-tools@^1.0.11:
-  version "1.0.11"
-  resolved "https://registry.yarnpkg.com/luna-prisma-tools/-/luna-prisma-tools-1.0.11.tgz#518c390a61ebdc44337ffec7b7d66d268fabe97c"
-  integrity sha512-YL1nW6yqcgocFX6LVBda/M/onyPqKs+NnL9+sjmOYA51f2l9LVZSH4IboMhMzJ7k6tYffwD0yfhG3j6mh9t9Qg==
+luna-prisma-tools@^1.0.12:
+  version "1.0.12"
+  resolved "https://registry.yarnpkg.com/luna-prisma-tools/-/luna-prisma-tools-1.0.12.tgz#fb653c7e20a2341df21c2a309918cf0daf7a83dd"
+  integrity sha512-FfwqarMHnXALiVv42PbIycIJBSbHimU83lG/+jv6iCajQoJLEdugCq5yDOWYi2LhxxK1pNaQsocigRLUpVVKGg==
   dependencies:
     apollo-cache-inmemory "^1.3.5"
     apollo-client "^2.4.5"

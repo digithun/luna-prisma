@@ -187,5 +187,6 @@ export const Pagination: React.SFC<PaginationPropTypes> = props => {
             <ul className="pagination">
                 {pagesNumber}
             </ul>
-        </nav>)
+        </nav>
+    )
 }
