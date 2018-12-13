@@ -1,0 +1,23 @@
+mutation {
+    createTodoList: createTodoList(data:{
+    name: "todoList-a"
+    todos: {
+      create:[
+        {
+          name: "todo-name-a-0"
+          description: "todo-des-a-0"
+          state: false
+          color: RED
+        },
+        {
+          name: "todo-name-a-1"
+          description: "todo-des-a-1"
+          state: false
+          color: BLUE
+        }
+      ]
+    }
+  }){
+    name
+  }
+}

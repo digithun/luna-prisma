@@ -1,0 +1,28 @@
+{
+    "todoLists": [
+        {
+            "id": "todo_list_id_0",
+            "name": "todo_list_name_0",
+            "todoes": [
+                {
+                    "id": "todo_id_00",
+                    "name": "todo_name_00",
+                    "state": false,
+                    "color": "RED"
+                }
+            ]
+        },
+        {
+            "id": "todo_list_id_1",
+            "name": "todo_list_name_1",
+            "todoes": [
+                {
+                    "id": "todo_id_10",
+                    "name": "todo_name_10",
+                    "state": false,
+                    "color": "RED"
+                }
+            ]
+        }
+    ]
+}
